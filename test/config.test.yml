@@ -1,0 +1,72 @@
+logging:  # Logging configuration parameters
+  level: DEBUG  # Level options: INFO|ERROR|DEBUG. Default: INFO
+  output: console  # Output options: console|file. Default: console
+
+pgsql:
+  host: postgis
+  user: urbo_admin
+  password: urbo
+  database: urbo
+  port: 5432
+
+redis:
+  host: redis
+  port: 6379
+  db: 0
+  password: urbo
+
+maxRuns: 1000
+
+connectorJobs:
+  active: true
+  psqlConcurrency: 100
+  cartoConcurrency: 10
+
+tasksSchedule:
+  - schedule: '30 2 * * *'
+    type: 'aggregator'
+  - type: dumpsHourly
+    schedule: '*/15 * * * *'
+    unitRange: m
+    magnitudRange: 15
+    truncateToUnit: minute
+    tableName: dumps_emptyings
+    category: dumps
+    job: dumpsjobs
+    carto: true
+  - type: dumpsFillingAgg
+    category: dumps
+    job: dumps_fillingagg
+    schedule: '7 23 * * *'
+    carto: true
+    magnitudeRange: 1
+    unitRange: days
+    truncateToUnit: hour
+    tableName: dumps_fillingagg
+  - type: environmentDaily
+    tableName: environment_aqobserved_measurand_agg
+    job: environmentjob
+    magnitudeRange: 1
+    unitRange: days
+    category: environment
+    truncateToUnit: hour
+    schedule: '8 23 * * *'
+    carto: true
+  - type: parkingHourly
+    category: parking
+    job: parkinghourlyjob
+    tableName: parking_offstreetparking_agg_hour
+    schedule: '5 * * * *'
+    magnitudeRange: 1
+    unitRange: h
+    truncateToUnit: hour
+    carto: true
+  - type: parkingDaily
+    category: parking
+    job: parkingdailyjob
+    tableName: parking_offstreetparking_agg_day
+    magnitudeRange: 1
+    unitRange: days
+    truncateToUnit: hour
+    schedule: '9 23 * * *'
+    carto: true
