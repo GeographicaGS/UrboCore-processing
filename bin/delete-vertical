@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const fs = require('fs');
+const fsExtra = require('fs-extra');
+const appDir = require('app-root-path').path;
+const path = require('path');
+
+const VERTICALS_DIR = './jobs/verticals'
+const jobsDir =  path.join(appDir, VERTICALS_DIR);
+
+const USAGE = 'USAGE: npm run-script delete-vertical -- <vertical-name>';
+
+if (process.argv.length < 3) {
+  console.error('No arguments were passed');
+  console.info(USAGE);
+  process.exit(1);
+}
+
+const verticalPath = VERTICALS_DIR;
+const verticalName = process.argv[2];
+const destPath = path.join(verticalPath, verticalName);
+
+try {
+  if (fs.lstatSync(destPath).isDirectory()) {
+    fsExtra.removeSync(destPath);
+    console.info(`Vertical ${ verticalName } was installed, so let's remove it`);
+    process.exit(0);
+  }
+} catch (e) {
+  console.error(`Vertical ${ verticalName } not found`);
+  process.exit(2);
+}

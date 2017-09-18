@@ -7,7 +7,9 @@
     "start": "node node_modules/gulp/bin/gulp.js",
     "start-dev": "node node_modules/gulp/bin/gulp.js start-dev",
     "debug": "node-debug --web-host 0.0.0.0 ./bin/processing",
-    "test": "mocha"
+    "test": "mocha",
+    "install-vertical": "node ./bin/install-vertical",
+    "delete-vertical": "node ./bin/delete-vertical"
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
@@ -16,6 +18,7 @@
     "cartodb": "^0.5.1",
     "cron-parser": "^2.2.1",
     "debug": "~2.2.0",
+    "fs-extra": "^4.0.2",
     "gulp": "^3.9.1",
     "gulp-batch": "^1.0.5",
     "gulp-watch": "^4.3.9",
