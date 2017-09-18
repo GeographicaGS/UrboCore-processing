@@ -1,0 +1,50 @@
+{
+  "name": "urbo-processing",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "transpile": "./node_modules/.bin/gulp transpile",
+    "start": "node node_modules/gulp/bin/gulp.js",
+    "start-dev": "node node_modules/gulp/bin/gulp.js start-dev",
+    "debug": "node-debug --web-host 0.0.0.0 ./bin/processing",
+    "test": "mocha",
+    "install-vertical": "node ./bin/install-vertical",
+    "delete-vertical": "node ./bin/delete-vertical"
+  },
+  "dependencies": {
+    "app-root-path": "^2.0.1",
+    "async": "^2.0.1",
+    "bluebird": "^3.4.6",
+    "cartodb": "^0.5.1",
+    "cron-parser": "^2.2.1",
+    "debug": "~2.2.0",
+    "fs-extra": "^4.0.2",
+    "gulp": "^3.9.1",
+    "gulp-batch": "^1.0.5",
+    "gulp-watch": "^4.3.9",
+    "js-yaml": "^3.5.3",
+    "kue": "^0.11.1",
+    "log4js": "^0.6.32",
+    "moment": "^2.13.0",
+    "moment-timezone": "^0.5.5",
+    "node-schedule": "^1.1.1",
+    "pg": "^4.5.1",
+    "squel": "^5.4.2",
+    "underscore": "^1.8.3",
+    "walk": "^2.3.9",
+    "zone.js": "^0.6.26"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-babili": "0.0.8",
+    "babel-preset-stage-1": "^6.16.0",
+    "chai": "^3.5.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-insert": "^0.5.0",
+    "gulp-uglify": "^2.0.0",
+    "mocha": "^2.5.3",
+    "pump": "^1.0.1",
+    "supertest": "^1.2.0"
+  }
+}

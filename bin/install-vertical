@@ -1,0 +1,67 @@
+#!/usr/bin/env node
+
+'use strict';
+
+const fs = require('fs');
+const fsExtra = require('fs-extra');
+const appDir = require('app-root-path').path;
+const path = require('path');
+
+const VERTICALS_DIR = './jobs/verticals'
+const jobsDir =  path.join(appDir, VERTICALS_DIR);
+
+
+const USAGE = 'USAGE: npm run-script install-vertical -- <vertical-source-path> <vertical-name>';
+
+if (process.argv.length < 4) {
+  console.error('No arguments were passed');
+  console.info(USAGE);
+  process.exit();
+}
+
+const verticalPath = VERTICALS_DIR;
+const srcPath = process.argv[2];
+const verticalName = process.argv[3];
+const destPath = path.join(verticalPath, verticalName);
+
+try {
+  if (fs.lstatSync(destPath).isDirectory()) {
+    console.info(`Vertical ${ verticalName } was installed, so let's update it`);
+    fsExtra.removeSync(destPath);
+  }
+} catch (e) {
+  console.info(`Fresh install of vertical ${ verticalName }`)
+}
+
+try {
+  if (!fs.lstatSync(srcPath).isDirectory() || !fs.lstatSync(path.join(srcPath, 'processing')).isDirectory()) {
+    throw `${ srcPath } is not a valid vertical`;
+  }
+} catch (e) {
+  console.error('The source path does not exist');
+  console.info(USAGE);
+  process.exit(1);
+}
+
+try {
+
+  const source = path.join(srcPath, 'processing');
+  const dest = path.join(destPath, 'processing');
+
+  fs.mkdirSync(destPath);
+  fs.mkdirSync(dest);
+
+  fsExtra.copy(source, dest, function (err) {
+    if (err) {
+      console.error(err);
+      process.exit(2);
+    }
+
+    console.info(`${ verticalName } installed successfully`);
+    process.exit(0);
+  });
+
+} catch(e){
+  console.error(e);
+  process.exit(2);
+}

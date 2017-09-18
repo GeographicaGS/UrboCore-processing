@@ -1,0 +1,83 @@
+#!/usr/bin/env node
+
+'use strict';
+
+/*
+ * Module dependencies
+ */
+var debug = require('debug')('processing');
+var fs = require('fs');
+var log4js = require('log4js');
+var pg = require('pg');
+var config = require('../config');
+var dispatch = require('../jobs/queue').dispatch;
+var Scheduler = require('../app');
+var log = null;
+var scheduler = null;
+
+/*
+ * PGSQL connection retries config.
+ */
+var connectRetries = 3;
+var connectRetryTimeout = 3000;
+var connectCount = 1;
+
+/**
+ * Logging creator.
+ */
+var startLogger = function() {
+  var logParams = config.getLogOpt();
+  if (logParams.consoleMessage) {
+    console.log(logParams.consoleMessage);
+  }
+
+  log4js.configure({
+    appenders: logParams.logappenders,
+    replaceConsole: true
+  });
+  var log = log4js.getLogger(logParams.output);
+
+  log.setLevel(logParams.level);
+  log.info('Logger successfully started');
+
+  return log;
+};
+
+/*
+ * Scheduler creator.
+ */
+var start = function() {
+  scheduler = new Scheduler();
+};
+
+/**
+ * Recursive n retries to connect PGSQL.
+ */
+var trydb = function(err, client, done) {
+  if (!err) {
+    log.info('Connected to PGSQL. Launching Server.');
+    log.info('Dispatching...');
+    dispatch();
+    start();
+
+  } else {
+    if (connectCount <= connectRetries) {
+      log.info('Connecting to PGSQL: ' + connectCount + '/' + connectRetries + ' retries failed. Waiting ' + (connectRetryTimeout / 1000) + ' seconds...');
+      connectCount = connectCount + 1;
+
+      setTimeout(function(){
+        pg.connect(config.getData().pgsql, trydb);
+      }, connectRetryTimeout);
+
+    } else {
+      log.fatal('FATAL EROR: Cannot connect to PGSQL.');
+    }
+  }
+};
+
+
+/**
+ * Creating the log and the processing.
+ */
+log = startLogger();
+pg.connect(config.getData().pgsql, trydb);
