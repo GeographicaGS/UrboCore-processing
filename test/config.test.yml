@@ -1,0 +1,23 @@
+logging:  # Logging configuration parameters
+  level: DEBUG  # Level options: INFO|ERROR|DEBUG. Default: INFO
+  output: console  # Output options: console|file. Default: console
+
+pgsql:
+  host: postgis
+  user: urbo_admin
+  password: urbo
+  database: urbo
+  port: 5432
+
+redis:
+  host: redis
+  port: 6379
+  db: 0
+  password: urbo
+
+maxRuns: 1000
+
+connectorJobs:
+  active: true
+  psqlConcurrency: 100
+  cartoConcurrency: 10
