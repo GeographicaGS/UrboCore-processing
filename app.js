@@ -38,9 +38,8 @@ var Scheduler = function () {
     tasks.forEach(function (taskConfig) {
       // Both, master and worker, create the JobObject, but only the master will schedule the jobs
       var classObj = getClassJob(taskConfig);
-      var classJ = new classObj(taskConfig);
       if(classObj) { var classJ = new classObj(taskConfig);}
-      else { log.warn("Error creating queue for " + taskConfig.job); }       
+      else { log.warn("Error creating queue for " + taskConfig.job); }
     });
 };
 
