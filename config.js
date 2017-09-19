@@ -20,12 +20,7 @@ var LOG_DEFAULT_FILENAME = 'the_log';
 var LOG_DEFAULT_MAX_SIZE = 20;
 var LOG_DEFAULT_OLD_FILES = 5;
 
-const VERTICALS_DIR = './jobs/verticals'
-const jobsDir =  ospath.join(appDir, VERTICALS_DIR);
-const dirs = p => fs.readdirSync(p).filter(f => fs.statSync(p+"/"+f).isDirectory())
-
 function Config() {
-
   this._data = yaml.safeLoad(fs.readFileSync('config.yml', 'utf8'));
 
   // Set default params
@@ -38,27 +33,6 @@ function Config() {
   }
 
   this.getData = function () {
-
-    this._data.tasksSchedule = this._data.tasksSchedule || [];
-
-
-    dirs(jobsDir).forEach( dir => {
-
-      try {
-        const configYml = ospath.join(jobsDir, dir, 'processing', 'config.yml');
-        const verticalData = yaml.safeLoad(fs.readFileSync(configYml, 'utf-8'));
-        verticalData.tasksSchedule.forEach(vertical => {
-          vertical.importpath = ospath.join(dir, 'processing');
-          this._data.tasksSchedule.push(vertical);
-        });
-
-      } catch(e){
-        console.error(e);
-      }
-
-
-    });
-
     return this._data;
   };
 
@@ -136,12 +110,10 @@ function Config() {
 
     // Reading from config file
     if (_logging) {
-      // if (_logging.level && LOG_LEVELS.includes(_logging.level)) {  // Not compatible with the current node version
       if (_logging.level && _.contains(LOG_LEVELS, _logging.level)) {
         logParams.level = _logging.level;
       }
 
-      // if (_access && _access.level && LOG_LEVELS.includes(_access.level)) {  // Not compatible with the current node version
       if (_access && _access.level && _.contains(LOG_LEVELS, _access.level)) {
         logParams.access.level = _access.level;
       }

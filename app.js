@@ -8,17 +8,22 @@ var ospath = require('path');
 var log = utils.log();
 var appDir = require('app-root-path').path;
 
-const VERTICALS_DIR = './jobs/verticals'
+const VERTICALS_DIR = './jobs/verticals';
+const VERTICALS_SUBDIR = 'processing';
 const jobsDir =  ospath.join(appDir, VERTICALS_DIR);
 
 // Dynamic loading for job categories
 var getClassJob = function(task) {
-
   console.log(task);
 
   try {
-    var classObj = require(ospath.join(jobsDir, task.importpath, task.job));
-    return classObj;
+    let requireString = ospath.join(jobsDir, task.category, VERTICALS_SUBDIR, task.job) + '.js';
+    try {
+      return require(requireString);
+    } catch (e) {
+      log.warn(`File not found for importing it: ${ requireString }`);
+      return undefined;
+    }
 
   } catch (e) {
     log.warn(e);
@@ -36,10 +41,13 @@ var Scheduler = function () {
 
     var tasks = config.getData().tasksSchedule || [];
     tasks.forEach(function (taskConfig) {
-      // Both, master and worker, create the JobObject, but only the master will schedule the jobs
       var classObj = getClassJob(taskConfig);
-      if(classObj) { var classJ = new classObj(taskConfig);}
-      else { log.warn("Error creating queue for " + taskConfig.job); }
+
+      if (classObj) {
+        new classObj(taskConfig);
+      } else {
+        log.warn('Error creating queue for ' + taskConfig.job);
+      }
     });
 };
 
