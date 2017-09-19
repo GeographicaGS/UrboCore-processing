@@ -56,5 +56,13 @@ connectorJobs:
   psqlConcurrency: 100
   cartoConcurrency: 10
 
-# A tasksSchedule section should be appended to every vertical, including proper configuration
-# tasksSchedule: []
+tasksSchedule:  # An example
+  - type: a_name
+    tableName: where_will_be_saved
+    job: the_js_job_file
+    category: category_vertical
+    magnitudeRange: 1
+    unitRange: days
+    truncateToUnit: hour
+    schedule: '3 11 * * *'
+    carto: true
