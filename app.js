@@ -8,7 +8,8 @@ var ospath = require('path');
 var log = utils.log();
 var appDir = require('app-root-path').path;
 
-const VERTICALS_DIR = './jobs/verticals'
+const VERTICALS_DIR = './jobs/verticals';
+const VERTICALS_SUBDIR = 'processing';
 const jobsDir =  ospath.join(appDir, VERTICALS_DIR);
 
 // Dynamic loading for job categories
@@ -16,7 +17,7 @@ var getClassJob = function(task) {
   console.log(task);
 
   try {
-    return require(ospath.join(jobsDir, task.importpath, task.job));
+    return require(ospath.join(jobsDir, task.category, VERTICALS_SUBDIR, task.job) + '.js');
 
   } catch (e) {
     log.warn(e);
