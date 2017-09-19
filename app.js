@@ -17,7 +17,13 @@ var getClassJob = function(task) {
   console.log(task);
 
   try {
-    return require(ospath.join(jobsDir, task.category, VERTICALS_SUBDIR, task.job) + '.js');
+    let requireString = ospath.join(jobsDir, task.category, VERTICALS_SUBDIR, task.job) + '.js';
+    try {
+      return require(requireString);
+    } catch (e) {
+      log.warn(`File not found for importing it: ${ requireString }`);
+      return undefined;
+    }
 
   } catch (e) {
     log.warn(e);
