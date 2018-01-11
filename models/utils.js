@@ -1,20 +1,20 @@
 // Copyright 2017 Telefónica Digital España S.L.
-// 
+//
 // This file is part of UrboCore Processing.
-// 
+//
 // UrboCore Processing is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // UrboCore Processing is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
 // along with UrboCore Processing. If not, see http://www.gnu.org/licenses/.
-// 
+//
 // For those usages not covered by this license please contact with
 // iot_support at tid dot es
 
@@ -30,6 +30,8 @@ module.exports.getPostgresType = function (type) {
     return 'geometry(Point,4326)';
   } else if (type === 'string' || type === 'stringOrList') {
     return 'text';
+  } else if (type === 'boolean') {
+      return 'boolean';
   } else if (type === 'integer') {
     return 'integer';
   } else if (type === 'float' || type === 'percent' || type === 'outcome') {
@@ -124,7 +126,7 @@ module.exports.getValueForType = function (value, type, outcome) {
     } else {
       return value;
     }
-  } else if (type === 'string' || type === 'integer' || type === 'float') {
+  } else if (type === 'boolean' || type === 'integer' || type === 'float' || type === 'string') {
     return value;
   } else if (type === 'stringOrList') {
       if(typeof value === 'string'){
@@ -171,7 +173,7 @@ module.exports.getValueForType = function (value, type, outcome) {
 };
 
 module.exports.isTypeQuoted = function (type) {
-  if (type === 'coords' || type.startsWith('geojson') || type.startsWith('list') || type === 'integer' || type === 'float' || type === 'percent' || type === 'outcome') {
+  if (type === 'coords' || type.startsWith('geojson') || type.startsWith('list') || type === 'boolean' || type === 'integer' || type === 'float' || type === 'percent' || type === 'outcome') {
     return false;
   } else if (type === 'string' || type === 'ISO8601' || type === 'timestamp' || type === 'json' || type === 'stringOrList') {
     return true;
