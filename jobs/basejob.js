@@ -286,11 +286,9 @@ class BaseJob {
 
   aggregate(job, done) {
     if (!this.cartoModels[job.data.idScope]) {
-      console.log('##########');
-      console.log(job);
-
       var jobInfo = `job ${job.id}: type '${job.type}' - title '${job.data.title}'`;
-      var err = new Error(`${jobInfo} FAILED: idScope is missing (${job.data.idScope}) and the Carto model couldn't be found`);
+      var fakeJobInfo = JSON.stringify(job);
+      var err = new Error(`${fakeJobInfo} FAILED: idScope is missing (${job.data.idScope}) and the Carto model couldn't be found`);
       log.error(err);
       return done(err);
     }
