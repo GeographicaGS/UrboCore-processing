@@ -1,20 +1,20 @@
 // Copyright 2017 Telefónica Digital España S.L.
-// 
+//
 // This file is part of UrboCore Processing.
-// 
+//
 // UrboCore Processing is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Affero General Public License as
 // published by the Free Software Foundation, either version 3 of the
 // License, or (at your option) any later version.
-// 
+//
 // UrboCore Processing is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
 // General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Affero General Public License
 // along with UrboCore Processing. If not, see http://www.gnu.org/licenses/.
-// 
+//
 // For those usages not covered by this license please contact with
 // iot_support at tid dot es
 
@@ -286,6 +286,9 @@ class BaseJob {
 
   aggregate(job, done) {
     if (!this.cartoModels[job.data.idScope]) {
+      console.log('##########');
+      console.log(job);
+
       var jobInfo = `job ${job.id}: type '${job.type}' - title '${job.data.title}'`;
       var err = new Error(`${jobInfo} FAILED: idScope is missing (${job.data.idScope}) and the Carto model couldn't be found`);
       log.error(err);
