@@ -28,7 +28,7 @@ var log = log4js.getLogger(logParams.output);
 module.exports.getPostgresType = function (type) {
   if (type === 'coords') {
     return 'geometry(Point,4326)';
-  } else if (type === 'string' || type === 'stringOrList') {
+  } else if (type === 'string' || type === 'stringOrList' || type === 'url') {
     return 'text';
   } else if (type === 'boolean') {
       return 'boolean';
@@ -145,7 +145,15 @@ module.exports.getValueForType = function (value, type, outcome) {
     return JSON.stringify(value);
   } else if (type === 'percent') {
     return value * 100;
-
+  } else if (type === 'url') {
+    var replace = {
+      "+": "%20"
+    };
+    value = value+'';
+    for (var key in replace) {
+      value = value.split(key).join(replace[key])
+    }
+    return decodeURIComponent(value);
   } else if (type === 'outcome') {
 
     if(outcome && outcome.factor && outcome.operation){
@@ -175,7 +183,7 @@ module.exports.getValueForType = function (value, type, outcome) {
 module.exports.isTypeQuoted = function (type) {
   if (type === 'coords' || type.startsWith('geojson') || type.startsWith('list') || type === 'boolean' || type === 'integer' || type === 'float' || type === 'percent' || type === 'outcome') {
     return false;
-  } else if (type === 'string' || type === 'ISO8601' || type === 'timestamp' || type === 'json' || type === 'stringOrList') {
+  } else if (type === 'string' || type === 'ISO8601' || type === 'timestamp' || type === 'json' || type === 'stringOrList' || type === 'url') {
     return true;
   } else {
     log.error('Unknown type: ' + type);
