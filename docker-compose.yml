@@ -1,18 +1,7 @@
-redis_processing:
-  image: redis:latest
-  ports:
-    - "6380:6379"
-  volumes:
-    - ./redis.conf:/usr/local/etc/redis/redis.conf
-  command: redis-server /usr/local/etc/redis/redis.conf
+version: "3.6"
 
-processing:
-  dockerfile: Dockerfile.dev
-  ports:
-    - "3002:3000"
-  links:
-    - postgis:postgis
-    - redis_processing:redis
-  volumes:
-    - ./:/usr/src/app
-  command: npm run-script start-dev # Livereload mode
+services:
+  redis:
+    image: redis:latest
+
+  processing:
