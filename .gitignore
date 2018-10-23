@@ -59,3 +59,6 @@ typings/
 
 ./jobs/verticals
 !./jobs/verticals/.gitkeep
+
+docker-compose.*.yml
+!docker-compose.override.yml
