@@ -123,7 +123,7 @@ module.exports.getValueForType = function (value, type, outcome) {
   } else if (type === 'ISO8601' || type === 'timestamp') {
 
     if (value && value !== ''){
-      let dates = value.split('/').map((x)=>{return new Date(x)});
+      var dates = value.split('/').map((x)=>{return new Date(x)});
 
       if(dates.filter((x)=>{return x == 'Invalid Date'}).length > 0){
         log.error(`Cannot cast ${value.toString()} to ISO8601: Invalid Date`);
