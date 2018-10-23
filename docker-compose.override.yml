@@ -1,0 +1,21 @@
+version: "3.6"
+
+services:
+  redis:
+    ports:
+      - "6380:6379"
+    command: redis-server --requirepass urbo
+
+  processing:
+    dockerfile: Dockerfile.dev
+    ports:
+      - "3002:3000"
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - net_urbo_db
+    command: npm run-script start-dev # Livereload mode
+
+networks:
+  net_urbo_db:
+    external: true
