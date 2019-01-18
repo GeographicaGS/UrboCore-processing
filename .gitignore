@@ -65,3 +65,6 @@ docker-compose.*.yml
 
 # basic config
 config.yml*
+
+# vscode
+.vscode
