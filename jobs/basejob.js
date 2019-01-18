@@ -58,14 +58,17 @@ class BaseJob {
       this.cartoConfigs = {};
       this.schemaToScope = {}; // Niapa, but necesary
 
-      scopes.forEach(function (scope) {
-        var currentCartoConfig = cartoConfig.accounts[scope.carto_user];
-        currentCartoConfig.user = scope.carto_user;
+      if ( cartoConfig.active ) {
+        scopes.forEach(function (scope) {
+          var currentCartoConfig = cartoConfig.accounts[scope.carto_user];
+          currentCartoConfig.user = scope.carto_user;
 
-        this.cartoConfigs[scope.id_scope] = currentCartoConfig;
-        this.cartoModels[scope.id_scope] = cartoConfig.active && cfg.carto ? new CartoDBModel(currentCartoConfig) : null;
-        this.schemaToScope[scope.dbschema] = scope.id_scope;
-      }.bind(this));
+
+          this.cartoConfigs[scope.id_scope] = currentCartoConfig;
+          this.cartoModels[scope.id_scope] = cartoConfig.active && cfg.carto ? new CartoDBModel(currentCartoConfig) : null;
+          this.schemaToScope[scope.dbschema] = scope.id_scope;
+        }.bind(this));
+      }
 
       // Controls whether aggregation can be enqueued or not
       this.populate = false;
