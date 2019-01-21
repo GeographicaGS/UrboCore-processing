@@ -15,6 +15,7 @@ const config = require(ospath.join(appDir, 'config'));
 const BaseJob = require(ospath.join(appDir, 'jobs', 'basejob'));
 const utils = require(ospath.join(appDir, 'utils'));
 const log = utils.log();
+const PGSQLModel = require('../../../../models/pgsqlmodel');
 
 const moment = require('moment-timezone');
 const pgsqlConfig = config.getData().pgsql;
@@ -32,14 +33,14 @@ class AqConsHourlyLastdataPuertoRealJob extends BaseJob {
 
   _aggregate(job, done) {
     /*
-     * - type: aqConsHourlyForPuertoReal
+     * - type: aqConsHourlyLastdataPuertoReal
      *   tableName: aq_cons_const_lastdata
-     *   job: aq_cons_hourlyForPuertoRealjob
+     *   job: aq_conshourlylastdatapuertorealjob
      *   category: aq_cons
      *   magnitudeRange: 1
      *   unitRange: hour
      *   truncateToUnit: hour
-     *   schedule: '10 2 * * * *'
+     *   schedule: '* 1 * * * *'
      *   carto: false
      */
 
@@ -80,9 +81,6 @@ class AqConsHourlyLastdataPuertoRealJob extends BaseJob {
     const fromDate = new moment(job.data.date).subtract(job.data.magnitudeRange, job.data.unitRange).startOf(job.data.truncateToUnit).toISOString();
     const datePattern = /\d{4}-\d{1,2}-\d{1,2}/;
 
-    log.debug('jobInfo', jobInfo);
-    log.debug('fromDate', fromDate);
-
     var options = {
       uri: 'http://77.241.112.100:8077/gen-publicservices-web/rest/contadores/lecturas',
       qs: {
@@ -97,70 +95,73 @@ class AqConsHourlyLastdataPuertoRealJob extends BaseJob {
       json: true
     };
 
+    let requests = "";
+    let dateProcessing = new Date;
+    let hourProcessing = dateProcessing.getHours();
+
     request(options)
     .then(function (data) {
 
-        let bynumSerie =  _(data).groupBy(v => ([v.numSerie]))
-                          .map( v =>
-                            _.merge(
-                              _.pick( v[1], 'numSerie', 'fechaHora'),
-                              {'volumenL': _.subtract( v[1]['volumenL'], v[0]['volumenL'] ) }
-                            )
+      let bynumSerie =  _(data).groupBy(v => ([v.numSerie]))
+                        .map( v =>
+                          _.merge(
+                            _.pick( v[1], 'numSerie', 'fechaHora'),
+                            {'volumenL': _.subtract( v[1]['volumenL'], v[0]['volumenL'] ) }
                           )
-                          .value();
+                        )
+                        .value();
 
+      bynumSerie.forEach(element => {
 
-        bynumSerie.forEach(element => {
-
-          if (element.volumenL != '0') {
-            console.log('element', element);
-            let secDate = new Date(element.fechaHora);
-            let secWeekDay = secDate.getDay();
-            let secMonth = secDate.getMonth();
-            let monthDay = "jul_oct";
-            if ( winterSpring.indexOf(secMonth) > -1 ) {
-              monthDay = "nov_jun"
-            }
-            if ( weekDays.indexOf(secWeekDay) > -1 ) {
-              monthDay = monthDay + '_week';
+        if (element.volumenL != '0') {
+          let secDate = new Date(element.fechaHora);
+          let secWeekDay = secDate.getDay();
+          let secMonth = secDate.getMonth();
+          let monthDay = "jul_oct";
+          if ( winterSpring.indexOf(secMonth) > -1 ) {
+            monthDay = "nov_jun"
+          }
+          if ( weekDays.indexOf(secWeekDay) > -1 ) {
+            monthDay = monthDay + '_week';
+          } else {
+            monthDay = monthDay + '_weekend';
+          }
+          let currentDate = new Date();
+          let currentHour = currentDate.getHours();
+          for (let totalL in models[monthDay]) {
+            if  ( element.volumenL >= totalL ) {
+              continue;
             } else {
-              monthDay = monthDay + '_weekend';
-            }
-            for (let totalL in models[monthDay]) {
-              if  ( element.volumenL >= totalL ) {
-                continue;
-              } else {
-                for (let hour in models[monthDay][totalL]) {
-                  let percent = models[monthDay][totalL][hour] * 100 / totalL;
-                  let valueL = ( percent * element.volumenL / 100 ) + ( (Math.random() * 0.007) + 0.001 ) ;
-                  let date = datePattern.exec(element.fechaHora)[0] + 'T' + ("0" + hour).slice(-2) + ':00:00Z';
-                  let sql = `SELECT urbo_aq_cons_propagate_lastdata_puertoreal('madrid', 'construction_id:${element.numSerie}', ${valueL}, ${date})
-                  `;
-                  console.log(sql);
-                  // this.pgModel.promise_query(sql, null, callback);
-
-                }
-                break;
-              }
+              let percent = models[monthDay][totalL][currentHour] * 100 / totalL;
+              let valueL = ( percent * element.volumenL / 100 ) + ( (Math.random() * 0.007) + 0.001 ) ;
+              let date = datePattern.exec(element.fechaHora)[0] + 'T' + ("0" + currentHour).slice(-2) + ':00:00Z';
+              let sql = `
+                SELECT urbo_aq_cons_propagate_lastdata_puertoreal('madrid', 'construction_id:${element.numSerie}', '${valueL}', '${date}');
+              `;
+              requests = requests.concat(sql);
+              break;
             }
           }
+        }
 
-        });
+      });
 
-        promise.all(promises);
-    })
-    .catch(function (err) {
-        console.log("err", err);
+      let callback = function (err, data) {
+        if (err) {
+          log.error(`${ jobInfo } FAILED: Error executing query`);
+          log.error(err);
+          return done(err);
+        }
+
+        log.debug(`${ jobInfo } DONE`);
+        return done();
+      };
+      let pgModel = new PGSQLModel(pgsqlConfig);
+      pgModel.query(requests, null, callback);
 
     });
 
-
-
-
-
-    // this.pgModel.query(sql, null, callback);
   }
-
 
 }
 
