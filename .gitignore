@@ -66,5 +66,8 @@ docker-compose.*.yml
 # basic config
 config.yml*
 
+# verticals folder
+jobs/verticals
+
 # vscode
 .vscode
