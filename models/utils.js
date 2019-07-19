@@ -162,7 +162,10 @@ module.exports.getValueForType = function (value, type, outcome) {
     return value * 100;
   } else if (type === 'url') {
     var replace = {
-      "+": "%20"
+      "+": "%20",
+      "\'": "''",
+      "%27": "''",
+      "%0A": "\n"
     };
     value = value+'';
     for (var key in replace) {
