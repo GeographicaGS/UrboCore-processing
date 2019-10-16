@@ -374,6 +374,10 @@ SubscriptionsModel.prototype.storeData = function (sub, contextResponses, cb) {
         objdq = {};
     obj['id_entity'] = contextResponses[i].contextElement.id;
 
+    if ('mapIdEntityValues' in sub && obj['id_entity'] in sub.mapIdEntityValues) {
+      obj['id_entity'] = sub.mapIdEntityValues[obj['id_entity']];
+    }
+
     var subAttr = sub.attributes.slice();
     var crAttr = contextResponses[i].contextElement.attributes.slice();
     if (_.find(subAttr, { namedb: 'lat', type: 'coords' }) && _.find(subAttr, { namedb: 'lon', type: 'coords' })) {
