@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
-    "async": "^2.0.1",
+    "async": "^2.6.4",
     "bluebird": "^3.4.6",
     "cartodb": "^0.5.1",
     "cron-parser": "^2.2.1",
