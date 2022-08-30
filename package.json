@@ -27,7 +27,7 @@
     "lodash": "4.17.11",
     "log4js": "^0.6.32",
     "moment": "^2.13.0",
-    "moment-timezone": "^0.5.5",
+    "moment-timezone": "^0.5.35",
     "node-schedule": "^1.1.1",
     "pg": "^4.5.1",
     "request": "2.88.0",
